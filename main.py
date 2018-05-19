@@ -17,8 +17,8 @@ class CoinMarketCapApiHelper:
         else:
             return False
 
-    def get_currency_ticker(self, id):
-        response = r.get(self.get_base_url() + 'ticker/' + id)
+    def get_currency_ticker(self, url_ext):
+        response = r.get(self.get_base_url() + 'ticker/' + url_ext)
         if response.status_code == 200:
             return json.loads(response.content.decode('utf-8'))
         else:
@@ -73,7 +73,23 @@ while run_program:
             invalid_input = False
             data = parsed_response["data"]
             # different print strategy
-            print(json.dumps(data, indent=4))
+
+            def get_quote_value(key):
+                return str(data["quotes"][currency_token][key])
+
+
+            print("\n".join(
+                [
+                    "Name: " + str(data["name"]),
+                    "Symbol: " + str(data["symbol"]),
+                    "Rank: " + str(data["rank"]),
+                    "Price: " + get_quote_value("price") + ' ' + currency_token,
+                    "Market Cap: " + get_quote_value("market_cap") + ' ' + currency_token,
+                    "1 HR % Change: " + get_quote_value("percent_change_1h"),
+                    "24 HR % Change: " + get_quote_value("percent_change_24h"),
+                    "7 Day % Change: " + get_quote_value("percent_change_7d"),
+                ])
+             + '\n')
 
     continue_program_input = input("Look up another crypto? (y/N)")
 
