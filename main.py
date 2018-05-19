@@ -27,6 +27,8 @@ class CoinMarketCapApiHelper:
 
 base_url = 'https://api.coinmarketcap.com/v2/'
 client = CoinMarketCapApiHelper(base_url)
+
+# set up dict of crypto tokens and ids
 parsed_response = client.get_listings()
 data = parsed_response['data']
 
@@ -39,32 +41,42 @@ for datum in data:
     else:
         continue
 
-# get a real currency token
-invalid_input = True
-crypto_token = ''
+run_program = True
 
-while invalid_input:
-    token = input("Enter a crypto symbol to view: \n")
-    if token in currency_dictionary:
-        invalid_input = False
-        crypto_token = token
-    else:
-        print('Invalid token')
+while run_program:
+    # get a real currency token
+    invalid_input = True
+    crypto_token = ''
 
-# select a currency
-invalid_input = True
+    while invalid_input:
+        token = input("Enter a crypto symbol to view: \n")
+        if token in currency_dictionary:
+            invalid_input = False
+            crypto_token = token
+        else:
+            print('Invalid token')
 
-while invalid_input:
-    currency_token = input("Enter a currency to convert to (just hit enter for USD): \n")
-    if len(currency_token) == 0:
-        currency_token = 'USD'
-    parsed_response = client.get_currency_ticker(str(currency_dictionary[crypto_token]) + '/?convert=' + currency_token)
-    if not parsed_response:
-        print('ERROR')
-        continue
-    else:
-        invalid_input = False
-        data = parsed_response["data"]
-        print(json.dumps(data, indent=4))
+    # select a currency
+    invalid_input = True
 
+    while invalid_input:
+        currency_token = input("Enter a currency to convert to (just hit enter for USD): \n")
+        if len(currency_token) == 0:
+            currency_token = 'USD'
 
+        parsed_response = client.get_currency_ticker(str(currency_dictionary[crypto_token]) + '/?convert=' + currency_token)
+
+        if not parsed_response:
+            print('ERROR')
+            continue
+        else:
+            invalid_input = False
+            data = parsed_response["data"]
+            # different print strategy
+            print(json.dumps(data, indent=4))
+
+    continue_program_input = input("Look up another crypto? (y/N)")
+
+    if continue_program_input.lower() == 'n':
+        print("goodbye")
+        run_program = False
