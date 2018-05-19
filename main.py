@@ -18,7 +18,7 @@ class CoinMarketCapApiHelper:
             return False
 
     def get_currency_ticker(self, id):
-        response = r.get(self.get_base_url() + 'ticker/' + id + '/')
+        response = r.get(self.get_base_url() + 'ticker/' + id)
         if response.status_code == 200:
             return json.loads(response.content.decode('utf-8'))
         else:
@@ -41,19 +41,30 @@ for datum in data:
 
 # get a real currency token
 invalid_input = True
+crypto_token = ''
 
 while invalid_input:
-    token = input("Enter a currency symbol to view: \n")
-    parsed_response = client.get_currency_ticker(str(currency_dictionary[token]))
-    if parsed_response is not False:
+    token = input("Enter a crypto symbol to view: \n")
+    if token in currency_dictionary:
         invalid_input = False
-        data = parsed_response['data']
-        print(data)
+        crypto_token = token
     else:
         print('Invalid token')
 
+# select a currency
+invalid_input = True
 
-
-
+while invalid_input:
+    currency_token = input("Enter a currency to convert to (just hit enter for USD): \n")
+    if len(currency_token) == 0:
+        currency_token = 'USD'
+    parsed_response = client.get_currency_ticker(str(currency_dictionary[crypto_token]) + '/?convert=' + currency_token)
+    if not parsed_response:
+        print('ERROR')
+        continue
+    else:
+        invalid_input = False
+        data = parsed_response["data"]
+        print(json.dumps(data, indent=4))
 
 
